@@ -4,4 +4,4 @@ handlers:
   static_dir: static
 - url: /.*
   secure: always
-  script: autok
+  script: auto
