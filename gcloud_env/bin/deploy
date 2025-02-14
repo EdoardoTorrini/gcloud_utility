@@ -1,0 +1,35 @@
+#!/bin/bash
+
+usage () {
+	echo "deploy PROJECT_ID YAML_PATH"
+}
+
+if [ "$#" -lt 1 ] || [ "$#" -ge 3 ]; then
+    usage
+    exit 1
+fi
+
+PROJECT_ID="$1"
+CHECK="$(basename $(pwd))"
+if [[ "$PROJECT_ID" != "$CHECK" ]]; then
+	echo "wrong PROJECT_ID: $CHECK != $PROJECT_ID"
+	exit 1
+fi
+
+YML_PATH="$2"
+if [[ ! -f "$(pwd)/$YML_PATH" ]]; then
+	echo "file yaml not exists"
+	exit 1
+fi
+
+RET="$(env | grep -c "$VIRTUAL_ENV_PROMPT")"
+if [[ "$RET" -lt 1 ]]; then
+	echo "you must be in a virtual env"
+	exit 1
+fi
+
+python -m pip freeze > requirements.txt
+/home/et/google-cloud-sdk/bin/gcloud app create --project="$PROJECT_ID"
+/home/et/google-cloud-sdk/bin/gcloud app deploy "$(pwd)/$YML_PATH"
+
+echo "WARNING: if last command give error: retry using gcloud app deploy app.yaml"

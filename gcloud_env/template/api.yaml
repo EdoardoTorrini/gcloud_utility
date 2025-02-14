@@ -1,0 +1,9 @@
+runtime: python311
+service: app
+entrypoint: gunicorn main:app
+handlers:
+- url: /static
+  static_dir: static
+- url: /.*
+  secure: always
+  script: auto

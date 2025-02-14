@@ -1,0 +1,21 @@
+#!/bin/bash
+
+usage () {
+    echo "usage: $0 TOPIC"
+    exit 1
+}
+
+if [ "$#" -lt 1 ] || [ "$#" -ge 2 ]; then
+    usage
+fi
+
+TOPIC="$1"
+
+CHECK=$(/home/et/google-cloud-sdk/bin/gcloud pubsub topics list 2>&1 | grep -c "$TOPIC")
+if [[ "$CHECK" -ne 0 ]]; then
+    echo "$TOPIC alredy exists"
+    exit 1
+fi
+
+# export TOPIC="$TOPIC"
+/home/et/google-cloud-sdk/bin/gcloud pubsub topics create ${TOPIC}
