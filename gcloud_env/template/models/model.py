@@ -23,7 +23,7 @@ class Model(object):
         data, name = { key.lower(): value for key, value in kwargs.items() }, name.lower()
         if len(res := self.get_data(name)) == 0:
             raise RuntimeError(f"ERROR: document {name} does not exists")
-        self.model_ref.document(name).set({**res[0], **data})
+        self.model_ref.document(name).set({**res[0][name], **data})
         
     def delete_document(self, name: str):
         name = name.lower()
