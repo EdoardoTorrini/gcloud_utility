@@ -29,6 +29,13 @@ if [[ -z "$PROJECT_ID" ]]; then
     usage
 fi
 
+# check if gcloud is in the environmental variable
+RET=$(command -v gcloud)
+if [[ "$?" -eq 1 ]]; then
+    echo "gcloud is not a command or is not present in your environmental path"
+    return 1
+fi
+
 # check if alredy exists the local project directory
 if [[ ! -d "$(pwd)/$PROJECT_ID" ]]; then
     mkdir ${PROJECT_ID}
@@ -39,23 +46,23 @@ fi
 
 # check if the user is logged
 export PROJECT_ID="$PROJECT_ID"
-RET="$(/home/et/google-cloud-sdk/bin/gcloud projects list 2>&1)"
+RET="$(gcloud projects list 2>&1)"
 
 ERROR_GCLOUD="ERROR: (gcloud.projects.list) You do not currently have an active account selected."
 CHECK="$(echo $RET | grep -c "$ERROR_GCLOUD")"
 
 # log into gcloud platform interactive
 if [[ CHECK -eq 1 ]]; then
-    /home/et/google-cloud-sdk/bin/gcloud auth login
+    gcloud auth login
 fi
 
 # configure the gcloud project
-RET="$(/home/et/google-cloud-sdk/bin/gcloud projects list --filter "$PROJECT_ID" 2>&1)"
+RET="$(gcloud projects list --filter "$PROJECT_ID" 2>&1)"
 if [[ "$RET" = "Listed 0 items." ]]; then
     echo "create the new project: $PROJECT_ID"
-    /home/et/google-cloud-sdk/bin/gcloud projects create "$PROJECT_ID" --set-as-default 2>&1
+    gcloud projects create "$PROJECT_ID" --set-as-default 2>&1
 else
-    /home/et/google-cloud-sdk/bin/gcloud config set project "$PROJECT_ID"
+    gcloud config set project "$PROJECT_ID"
 fi
 
 # check of the virtual environment
@@ -84,18 +91,22 @@ check_python_lib "gunicorn"
 check_python_lib "flask-cors"
 check_python_lib "flask-classful"
 
-RET="$(/home/et/google-cloud-sdk/bin/gcloud iam service-accounts list | grep -c "$NAME")"
+RET="$(gcloud iam service-accounts list | grep -c "$NAME")"
 if [[ "$RET" -lt 1 ]]; then
     echo "create new user: $NAME"
-    /home/et/google-cloud-sdk/bin/gcloud iam service-accounts create $NAME
+    gcloud iam service-accounts create $NAME
 fi
 
 # could be rendundant
-/home/et/google-cloud-sdk/bin/gcloud projects add-iam-policy-binding $PROJECT_ID --member "serviceAccount:${NAME}@${PROJECT_ID}.iam.gserviceaccount.com" --role "roles/owner"
-/home/et/google-cloud-sdk/bin/gcloud iam service-accounts keys create credentials.json --iam-account ${NAME}@${PROJECT_ID}.iam.gserviceaccount.com
+gcloud projects add-iam-policy-binding $PROJECT_ID --member "serviceAccount:${NAME}@${PROJECT_ID}.iam.gserviceaccount.com" --role "roles/owner"
+gcloud iam service-accounts keys create credentials.json --iam-account ${NAME}@${PROJECT_ID}.iam.gserviceaccount.com
 
 export GOOGLE_APPLICATION_CREDENTIALS=$(pwd)/credentials.json
 
-if [[ ":$PATH:" != ":$HOME/esercitazioni/bin"* ]]; then
-        export PATH="$HOME/esercitazioni/bin:$PATH"
+if [[ ":$PATH:" != ":$HOME/gcloud_env/bin"* ]]; then
+        export PATH="$HOME/gcloud_env/bin:$PATH"
+fi
+
+if [[ ":$PATH:" != ":$HOME/gcloud_env/bin/api_check"* ]]; then
+        export PATH="$HOME/gcloud_env/bin/api_check:$PATH"
 fi
