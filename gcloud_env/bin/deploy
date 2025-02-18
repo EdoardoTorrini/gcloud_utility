@@ -29,7 +29,7 @@ if [[ "$RET" -lt 1 ]]; then
 fi
 
 python -m pip freeze > requirements.txt
-gcloud app create --project="$PROJECT_ID"
-gcloud app deploy "$(pwd)/$YML_PATH"
+$HOME/google-cloud-sdk/bin/gcloud app create --project="$PROJECT_ID"
+$HOME/google-cloud-sdk/bin/gcloud app deploy "$(pwd)/$YML_PATH"
 
 echo "WARNING: if last command give error: retry using gcloud app deploy app.yaml"

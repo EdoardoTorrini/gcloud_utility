@@ -11,11 +11,11 @@ fi
 
 TOPIC="$1"
 
-CHECK=$(gcloud pubsub topics list 2>&1 | grep -c "$TOPIC")
+CHECK=$($HOME/google-cloud-sdk/bin/gcloud pubsub topics list 2>&1 | grep -c "$TOPIC")
 if [[ "$CHECK" -ne 0 ]]; then
     echo "$TOPIC alredy exists"
     exit 1
 fi
 
 # export TOPIC="$TOPIC"
-gcloud pubsub topics create ${TOPIC}
+$HOME/google-cloud-sdk/bin/gcloud pubsub topics create ${TOPIC}
