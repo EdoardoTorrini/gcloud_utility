@@ -12,17 +12,17 @@ fi
 SUBSCRIPTION_NAME="$1"
 TOPIC="$2"
 
-CHECK=$(gcloud pubsub topics list 2>&1 | grep -c "/$TOPIC")
+CHECK=$($HOME/google-cloud-sdk/bin/gcloud pubsub topics list 2>&1 | grep -c "/$TOPIC")
 if [[ "$CHECK" -eq 0 ]]; then
     echo "$TOPIC does not exists, use create_topic TOPIC_NAME"
     exit 1
 fi
 
-CHECK=$(gcloud pubsub subscriptions list 2>&1 | grep -c "$SUBSCRIPTION_NAME")
+CHECK=$($HOME/google-cloud-sdk/bin/gcloud pubsub subscriptions list 2>&1 | grep -c "$SUBSCRIPTION_NAME")
 if [[ "$CHECK" -ne 0 ]]; then
     echo "$SUBSCRIPTION_NAME alredy exists"
     exit 1
 fi
 
 # export SUBSCRIPTION_NAME="$SUBSCRIPTION_NAME"
-gcloud pubsub subscriptions create ${SUBSCRIPTION_NAME} --topic $TOPIC
+$HOME/google-cloud-sdk/bin/gcloud pubsub subscriptions create ${SUBSCRIPTION_NAME} --topic $TOPIC
